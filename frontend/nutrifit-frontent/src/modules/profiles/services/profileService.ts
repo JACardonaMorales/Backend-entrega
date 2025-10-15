@@ -9,7 +9,7 @@ export class ApiError extends Error {
 }
 
 // URL base de tu API (ajusta si es necesario)
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 /**
  * Obtiene el perfil de un usuario por su ID.
