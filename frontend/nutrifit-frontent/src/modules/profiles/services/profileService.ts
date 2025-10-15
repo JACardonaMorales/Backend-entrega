@@ -1,12 +1,5 @@
 import { Profile, UpdateProfileDto } from '../types';
-
-// Define un tipo para el error de la API si no lo tienes globalmente
-export class ApiError extends Error {
-  constructor(public status: number, message: string) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
+import { ApiError } from '@/types/api';
 
 // URL base de tu API (ajusta si es necesario)
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
