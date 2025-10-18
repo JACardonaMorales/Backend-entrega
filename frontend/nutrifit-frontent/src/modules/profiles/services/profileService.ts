@@ -1,36 +1,76 @@
 import { Profile, UpdateProfileDto } from '../types';
 
-// --- AÑADE ESTA DEFINICIÓN DE CLASE AQUÍ ---
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
     this.name = 'ApiError';
   }
 }
-// --- FIN DEL CÓDIGO A AÑADIR ---
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export async function getProfileByUserId(userId: number): Promise<Profile> {
-  const response = await fetch(`${API_URL}/profiles/${userId}`);
-  if (!response.ok) {
-    throw new ApiError(response.status, 'Failed to fetch profile');
+  const url = `${API_URL}/profiles/${userId}`;
+  console.log('🔍 Fetching profile from:', url);
+  
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    console.log('📡 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new ApiError(response.status, `Failed to fetch profile: ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log('✅ Profile fetched:', data);
+    return data;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    console.error('❌ Network error:', error);
+    throw new Error('No se pudo conectar con el servidor. ¿Está el backend corriendo?');
   }
-  return response.json();
 }
 
 export async function updateProfile(userId: number, data: UpdateProfileDto): Promise<Profile> {
-  const response = await fetch(`${API_URL}/profiles/${userId}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
+  const url = `${API_URL}/profiles/${userId}`;
+  console.log('📝 Updating profile at:', url);
+  console.log('📦 Data to send:', data);
+  
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new ApiError(response.status, errorData.message || 'Failed to update profile');
+    console.log('📡 Response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Error response:', errorData);
+      throw new ApiError(response.status, errorData.message || 'Failed to update profile');
+    }
+    
+    const updatedProfile = await response.json();
+    console.log('✅ Profile updated:', updatedProfile);
+    return updatedProfile;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    console.error('❌ Network error:', error);
+    throw new Error('No se pudo conectar con el servidor. ¿Está el backend corriendo?');
   }
-  return response.json();
 }
